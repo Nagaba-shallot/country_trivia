@@ -1,0 +1,39 @@
+name: OpenCode PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Run OpenCode Review
+        uses: opencode-ai/opencode-action@v1
+        with:
+          model: opencode/big-pickle
+          prompt: |
+            Review the changes in this pull request.
+
+            Focus on:
+            - Correctness and logic errors
+            - Architecture consistency with MVVM + Provider pattern
+            - Code quality and adherence to flutter_lints
+            - Test coverage and quality
+            - Potential bugs or edge cases
+
+            Provide a concise summary with:
+            1. Overall assessment (approve / request changes / comment)
+            2. Key findings (if any)
+            3. Suggestions for improvement (if any)
+
+            Keep the review focused and actionable.

@@ -10,20 +10,16 @@ class CountryDto {
   });
 
   factory CountryDto.fromJson(Map<String, dynamic> json) {
-    final name = json['name'] as Map<String, dynamic>?;
-    final commonName = name?['common'] as String? ?? '';
-    final cca2 = json['cca2'] as String? ?? '';
-
     return CountryDto(
-      commonName: commonName,
-      cca2: cca2,
+      commonName: json['name'] as String,
+      cca2: json['cca2'] as String,
     );
   }
 
   Country toDomain() {
     return Country(
       name: commonName,
-      isoCode: cca2.toLowerCase(),
+      isoCode: cca2,
     );
   }
 }

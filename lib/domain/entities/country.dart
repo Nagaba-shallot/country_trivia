@@ -7,18 +7,17 @@ class Country {
     required this.isoCode,
   });
 
-  String get flagUrl => 'http://flagcdn.com/w320/$isoCode.png';
+  String get flagUrl => 'http://flagcdn.com/w320/${isoCode.toLowerCase()}.png';
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is Country &&
           runtimeType == other.runtimeType &&
-          name == other.name &&
           isoCode == other.isoCode;
 
   @override
-  int get hashCode => name.hashCode ^ isoCode.hashCode;
+  int get hashCode => isoCode.hashCode;
 
   @override
   String toString() => 'Country(name: $name, isoCode: $isoCode)';

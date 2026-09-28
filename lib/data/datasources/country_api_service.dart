@@ -1,32 +1,41 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 
-import '../../core/errors/failures.dart';
 import '../../core/constants/api_constants.dart';
+import '../../core/errors/failures.dart';
 import '../models/country_dto.dart';
 
 class CountryApiService {
-  final http.Client _client;
+  final http.Client client;
 
-  CountryApiService({http.Client? client}) : _client = client ?? http.Client();
+  CountryApiService({required this.client});
 
   Future<List<CountryDto>> fetchAllCountries() async {
-    try {
-      final uri = Uri.parse('${ApiConstants.baseUrl}/all?fields=name,cca2');
-      final response = await _client.get(uri);
+    final uri = Uri.parse(
+      '${ApiConstants.baseUrl}${ApiConstants.allCountriesEndpoint}',
+    );
 
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonList = json.decode(response.body) as List<dynamic>;
-        return jsonList
-            .map((json) => CountryDto.fromJson(json as Map<String, dynamic>))
-            .toList();
-      } else {
-        throw ServerFailure('Failed to fetch countries: ${response.statusCode}');
-      }
-    } on ServerFailure {
-      rethrow;
+    http.Response response;
+    try {
+      response = await client.get(uri);
     } catch (e) {
       throw ServerFailure('Network error: $e');
+    }
+
+    if (response.statusCode != 200) {
+      throw ServerFailure(
+        'Failed to fetch countries: HTTP ${response.statusCode}',
+      );
+    }
+
+    try {
+      final List<dynamic> jsonList = json.decode(response.body) as List<dynamic>;
+      return jsonList
+          .map((json) => CountryDto.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw ServerFailure('Failed to parse countries response: $e');
     }
   }
 }
